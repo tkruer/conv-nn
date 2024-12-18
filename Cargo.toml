@@ -1,0 +1,25 @@
+[package]
+name = "conv-nn"
+version = "0.1.0"
+edition = "2021"
+
+
+[lib]
+name = "conv_nn"
+path = "src/lib.rs"
+
+[[bin]]
+name = "conv_nn"
+path = "src/main.rs"
+
+[dependencies]
+image = "0.25.5"
+indicatif = "0.17.9"
+ndarray = { version = "0.16.1", features = ["serde"] }
+rand = "0.8.5"
+rand_distr = "0.4.3"
+rayon = "1.10.0"
+rust-mnist = "0.2.0"
+serde = { version = "1.0.216", features = ["derive"] }
+serde_json = "1.0.133"
+walkdir = "2.5.0"
