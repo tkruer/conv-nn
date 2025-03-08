@@ -1,0 +1,44 @@
+File: models/model_1741400398381.json
+Time: 1741400398381
+Minibatch size: 10
+Training size: 60000
+Testing size: 10000
+
+Layers:
+Convolutional Layer
+Input Size: 28x28x3
+Kernel Size: 3x3
+Output Size: 26x26x8
+Stride: 1
+Number of Filters: 8
+
+Max Pooling Layer
+Input Size: 26x26x8
+Kernel Size: 2x2
+Output Size: 13x13x8
+Stride: 2
+
+Dense Layer
+Input Size: 1352
+Output Size: 128
+Activation: Relu
+Dropout: Some(0.25)
+Optimizer: SGD: Learning Rate = 0.1
+
+Dense Layer
+Input Size: 128
+Output Size: 64
+Activation: Relu
+Dropout: Some(0.25)
+Optimizer: SGD: Learning Rate = 0.1
+
+Dense Layer
+Input Size: 64
+Output Size: 10
+Activation: Softmax
+Dropout: None
+Optimizer: SGD: Learning Rate = 0.1
+
+Training accuracy: [0.9209167, 0.96891665, 0.97536665, 0.98, 0.98258334, 0.98385, 0.98541665, 0.98665, 0.98756665, 0.98826665]
+Testing accuracy: [0.9748, 0.9783, 0.9821, 0.9822, 0.985, 0.98, 0.9824, 0.9868, 0.988, 0.9871]
+Time taken: [71, 141, 210, 279, 347, 416, 484, 552, 620, 688]

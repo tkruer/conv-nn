@@ -18,4 +18,3 @@ This is a basic implementation of a Convolutional Neural Network (CNN) in Rust s
 - [ ] Work on some of these optimizations (rayon for parallelization, etc.)
 - [ ] Full write up of the math and concepts behind CNNs (and maybe some other stuff)
 - [ ] Showcase full accuracy of the network
-

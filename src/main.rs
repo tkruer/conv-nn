@@ -10,7 +10,7 @@ fn main() {
     // Set hyperparameters
     let hyperparameters = Hyperparameters {
         batch_size: 10,
-        epochs: 10,
+        epochs: 1,
         optimizer: OptimizerAlg::SGD(0.1),
         ..Hyperparameters::default()
     };
@@ -24,5 +24,9 @@ fn main() {
     cnn.add_dense_layer(64, Activation::Relu, Some(0.25));
     cnn.add_dense_layer(10, Activation::Softmax, None);
 
+    // Train the CNN
     cnn.train();
+
+    // Save the CNN
+    cnn.save(true);
 }
