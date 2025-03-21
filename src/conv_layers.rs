@@ -7,19 +7,19 @@ use std::ops::{AddAssign, SubAssign};
 
 #[derive(Serialize, Deserialize)]
 pub struct ConvLayer {
-    input_size: (usize, usize, usize),
-    kernel_size: usize,
+    pub input_size: (usize, usize, usize),
+    pub kernel_size: usize,
     pub output_size: (usize, usize, usize),
     #[serde(skip)]
-    input: Array3<f32>,
+    pub input: Array3<f32>,
     #[serde(skip)]
-    output: Array3<f32>,
-    stride: usize,
-    num_filters: usize,
-    kernels: Array4<f32>,
+    pub output: Array3<f32>,
+    pub stride: usize,
+    pub num_filters: usize,
+    pub kernels: Array4<f32>,
     #[serde(skip)]
-    kernel_changes: Array4<f32>,
-    optimizer: Optimizer4D,
+    pub kernel_changes: Array4<f32>,
+    pub optimizer: Optimizer4D,
 }
 
 impl Debug for ConvLayer {

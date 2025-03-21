@@ -40,20 +40,20 @@ impl Default for Hyperparameters {
 
 #[derive(Serialize, Deserialize)]
 pub struct CNN {
-    layers: Vec<Layer>,
-    layer_order: Vec<String>,
-    data: TrainingData,
-    minibatch_size: usize,
-    creation_time: SystemTime,
-    saving_strategy: SavingStrategy,
-    training_history: Vec<f32>,
-    testing_history: Vec<f32>,
-    time_history: Vec<usize>,
-    name: String,
-    verbose: bool,
-    optimizer: OptimizerAlg,
-    epochs: usize,
-    input_shape: (usize, usize, usize),
+    pub layers: Vec<Layer>,
+    pub layer_order: Vec<String>,
+    pub data: TrainingData,
+    pub minibatch_size: usize,
+    pub creation_time: SystemTime,
+    pub saving_strategy: SavingStrategy,
+    pub training_history: Vec<f32>,
+    pub testing_history: Vec<f32>,
+    pub time_history: Vec<usize>,
+    pub name: String,
+    pub verbose: bool,
+    pub optimizer: OptimizerAlg,
+    pub epochs: usize,
+    pub input_shape: (usize, usize, usize),
 }
 
 impl Debug for CNN {
@@ -110,6 +110,13 @@ impl CNN {
     pub fn load(model_file_name: &str) -> CNN {
         let model_file = File::open(model_file_name).unwrap();
         let cnn: CNN = serde_json::from_reader(model_file).unwrap();
+
+        cnn
+    }
+
+    pub fn load_binary(model_file_name: &str) -> CNN {
+        let model_file = File::open(model_file_name).unwrap();
+        let cnn: CNN = bincode::deserialize_from(model_file).unwrap();
 
         cnn
     }
@@ -190,16 +197,17 @@ impl CNN {
 
     pub fn forward_propagate(&mut self, image: Array3<f32>, training: bool) -> Array1<f32> {
         let mut output: Array3<f32> = image;
-        let mut flat_output: Array1<f32> = output.clone().into_shape(output.len()).unwrap();
+        let mut flat_output: Array1<f32> =
+            output.clone().into_shape_with_order(output.len()).unwrap();
         for layer in &mut self.layers {
             match layer {
                 Layer::Conv(conv_layer) => {
                     output = conv_layer.forward_propagate(output);
-                    flat_output = output.clone().into_shape(output.len()).unwrap();
+                    flat_output = output.clone().into_shape_with_order(output.len()).unwrap();
                 }
                 Layer::Mxpl(mxpl_layer) => {
                     output = mxpl_layer.forward_propagate(output);
-                    flat_output = output.clone().into_shape(output.len()).unwrap();
+                    flat_output = output.clone().into_shape_with_order(output.len()).unwrap();
                 }
                 Layer::Dense(dense_layer) => {
                     flat_output = dense_layer.forward_propagate(flat_output, training);
@@ -223,7 +231,7 @@ impl CNN {
         let mut flat_error: Array1<f32> = self.last_layer_error(label);
         let mut error: Array3<f32> = flat_error
             .clone()
-            .into_shape((1, 1, flat_error.len()))
+            .into_shape_with_order((1, 1, flat_error.len()))
             .unwrap();
         for layer in self.layers.iter_mut().rev() {
             match layer {
@@ -239,7 +247,7 @@ impl CNN {
                     flat_error = dense_layer.back_propagate(flat_error, training);
                     error = flat_error
                         .clone()
-                        .into_shape(dense_layer.transition_shape)
+                        .into_shape_with_order(dense_layer.transition_shape)
                         .unwrap();
                 }
             }
@@ -393,18 +401,39 @@ impl CNN {
         std::fs::create_dir_all("models").unwrap();
         let time_str = self
             .creation_time
-            .duration_since(UNIX_EPOCH)
+            .duration_since(std::time::UNIX_EPOCH)
             .unwrap()
             .as_millis();
+
         if full_save {
+            // Save as JSON
             let model_file_name = format!("models/{}_{}.json", self.name, time_str);
-            let model_file = std::fs::File::create(&model_file_name).unwrap();
+            let model_file = File::create(&model_file_name).unwrap();
             serde_json::to_writer(model_file, &self).unwrap();
+
+            // Save as binary
+            let binary_file_name = format!("models/model.bin");
+            let binary_file = File::create(&binary_file_name).unwrap();
+            bincode::serialize_into(binary_file, &self).unwrap();
         }
 
-        // Write metadata to models/model_{}.txt
-        let metadata_file_name = format!("models/{}_{}.txt", self.name, time_str);
-        let mut metadata_file = std::fs::File::create(&metadata_file_name).unwrap();
+        // Write metadata to a text file
+        let metadata_file_name = format!("models/model.txt");
+        let mut metadata_file = File::create(&metadata_file_name).unwrap();
         write!(metadata_file, "{:?}", self).unwrap();
+    }
+
+    pub fn test(&mut self) {
+        let mut avg_test_acc = 0.0;
+        for _i in 0..self.data.tst_size {
+            let (image, label) = get_random_test_image(&self.data);
+            let label = *self.data.classes.get(&label).unwrap();
+            self.forward_propagate(image, false);
+
+            avg_test_acc += self.get_accuracy(label); //self.data.tst_lbl[i] as usize);
+        }
+
+        avg_test_acc /= self.data.tst_size as f32;
+        println!("Test accuracy: {:.1}%", avg_test_acc * 100.0);
     }
 }

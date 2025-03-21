@@ -9,4 +9,3 @@ This is a basic implementation of a Convolutional Neural Network (CNN) in Rust s
 ## Demo
 
 ![image](./images/image.png)
-
