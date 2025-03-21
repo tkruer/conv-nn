@@ -10,12 +10,3 @@ This is a basic implementation of a Convolutional Neural Network (CNN) in Rust s
 
 ![image](./images/image.png)
 
-## TODO
-
-- [ ] Implement a quick `wget` script to grab dataset
-- [ ] Put together benchmarking for implementation
-- [ ] Would be interesting to see if we can generate a `.bin` and use for inference in a notebook or other demo
-- [ ] Work on some of these optimizations (rayon for parallelization, etc.)
-- [ ] Full write up of the math and concepts behind CNNs (and maybe some other stuff)
-- [ ] Showcase full accuracy of the network
-
